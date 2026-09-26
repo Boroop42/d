@@ -9,6 +9,12 @@
 - Python 검사 5개 추가 및 통과: 기기 bundle 허용, Simulator/잘못된 식별자 거부, 버전과 재시도, 입력값 검증, plist/manifest 검사.
 - 실제 원격 컴파일·IPA artifact 결과는 [RELEASE_STATUS.md](RELEASE_STATUS.md)를 우선 확인하세요. 아래는 최초 Phase 1–2 작성 당시의 기록입니다.
 
+### 최종 원격 검증 완료
+
+[GitHub Actions run 36235370149](https://github.com/Boroop42/d/actions/runs/36235370149)이 성공했습니다. Xcode 26.6에서 iPhoneOS 26.5 SDK와 deployment target 17.0으로 arm64 Release 앱을 실제 컴파일했습니다. XcodeGen 설정 리소스 설치 오류를 수정했으며, 최신 WebKit delegate의 `@MainActor @Sendable` callback 서명도 맞췄습니다. `SWIFT_TREAT_WARNINGS_AS_ERRORS=YES`로 최종 Swift 경고 없이 컴파일됐습니다.
+
+실제 `PikoIOS.ipa`가 artifact로 업로드됐고 Windows에 다운로드하여 SHA-256, ZIP 무결성, Mach-O CPU/platform, iPhoneOS plist, 실행 권한을 추가 확인했습니다. 빌드·체크섬 상세는 RELEASE_STATUS.md에 있습니다. 최초 기록의 'iOS 컴파일 미검증 / IPA 미생성' 상태는 이 결과로 해소됐습니다. 실제 iPhone 재서명·설치·X 로그인 검증은 사용자 기기에서 남아 있습니다.
+
 ## 수행 결과
 
 - APK ZIP/DEX의 지정된 기능 문자열 검사 및 SHA-256 기록 완료. APK 코드는 실행하지 않았습니다.

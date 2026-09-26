@@ -18,6 +18,8 @@ Output: **`PikoIOS.ipa`** — Windows의 AltStore Classic/AltServer 또는 Sidel
 
 **실제로 확인한 빌드·artifact 상태:** [RELEASE_STATUS.md](RELEASE_STATUS.md). 앱이 iPhone에서 실행되는지의 최종 확인은 서명·설치 후 사용자 기기에서 수행합니다.
 
+검증 완료된 IPA: [1.0 (3.1) — 성공한 Actions artifact](https://github.com/Boroop42/d/actions/runs/36235370149/artifacts/10903793524). artifact ZIP 내부의 `PikoIOS.ipa`를 사용하세요.
+
 ## 유지한 기능
 
 - 공식 `https://x.com/home` WKWebView, `WKWebsiteDataStore.default()` 로그인 유지.
