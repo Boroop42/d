@@ -1,0 +1,46 @@
+name: Build PikoWebViewSmokeTest IPA
+on:
+  push:
+    branches: [smoke-test]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Select Xcode
+        run: bash scripts/select-xcode.sh
+      - name: Install XcodeGen
+        run: bash scripts/install-xcodegen.sh
+      - name: Generate isolated smoke test project
+        run: xcodegen generate --spec SmokeTest/project.yml --project SmokeTest
+      - name: Build physical iPhone app
+        run: |
+          set -o pipefail
+          mkdir -p build/smoke
+          xcodebuild -project SmokeTest/PikoWebViewSmokeTest.xcodeproj \
+            -scheme PikoWebViewSmokeTest -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/SmokeDerivedData \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' DEVELOPMENT_TEAM='' \
+            CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" \
+            build 2>&1 | tee build/smoke/compile.log
+      - name: Package and verify device IPA
+        run: python3 SmokeTest/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PikoWebViewSmokeTest-ipa
+          path: |
+            build/smoke/PikoWebViewSmokeTest.ipa
+            build/smoke/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PikoWebViewSmokeTest-build-log
+          path: build/smoke/compile.log
