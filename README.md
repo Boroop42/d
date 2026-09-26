@@ -18,7 +18,7 @@ Output: **`PikoIOS.ipa`** — Windows의 AltStore Classic/AltServer 또는 Sidel
 
 **실제로 확인한 빌드·artifact 상태:** [RELEASE_STATUS.md](RELEASE_STATUS.md). 앱이 iPhone에서 실행되는지의 최종 확인은 서명·설치 후 사용자 기기에서 수행합니다.
 
-검증 완료된 IPA: [1.0 (3.1) — 성공한 Actions artifact](https://github.com/Boroop42/d/actions/runs/36235370149/artifacts/10903793524). artifact ZIP 내부의 `PikoIOS.ipa`를 사용하세요.
+검증 완료된 IPA: [1.0 (6.1) — 성공한 Actions artifact](https://github.com/Boroop42/d/actions/runs/36237921272/artifacts/10904499432). artifact ZIP 내부의 `PikoIOS.ipa`를 사용하세요.
 
 ## 유지한 기능
 
@@ -41,7 +41,7 @@ Debug 빌드의 `[PikoNavigation]` 로그에는 URL(민감 부분 제거), hostn
 
 ## CI가 만드는 것
 
-Checkout → 안정 Xcode 선택 → **XcodeGen 2.46.0**(공식 ZIP SHA-256 검사) → DOM/구성 테스트 → 프로젝트 생성 → iPhoneOS Release 컴파일 → `Payload/PikoIOS.app` 패키징 → `PikoIOS.ipa` 검사 → artifact 업로드.
+Checkout → 안정 Xcode 선택 → **XcodeGen 2.46.0**(공식 ZIP SHA-256 검사) → DOM/구성 테스트 → 프로젝트 생성 → iOS Simulator XCTest → iPhoneOS Release 컴파일 → `Payload/PikoIOS.app` 패키징 → `PikoIOS.ipa` 검사 → artifact 업로드.
 
 패키징은 macOS `ditto`를 사용합니다. 검사 단계는 실제 Mach-O가 `arm64`이고 platform이 `IOS`인지 확인하여 arm64 Simulator와 구분합니다. Info.plist의 iPhoneOS, Bundle ID, 버전, 개인정보 매니페스트 및 IPA 구조를 검사합니다. 파일 누락이나 검증 실패 시 workflow는 성공 처리되지 않습니다.
 
@@ -85,3 +85,5 @@ python -m unittest discover -s Tests/Python -v
 Swift/iOS 컴파일은 Windows 로컬 테스트로 대신하지 않으며 GitHub macOS runner의 결과로 확인합니다. `xcodegen generate`로 프로젝트를 재생성할 수 있습니다. CI는 환경값을 별도 설정 파일에 반영하여 프로젝트를 생성합니다.
 
 추가 자료: [APK 분석](APK_ANALYSIS.md), [기능 호환성](FEATURE_COMPATIBILITY.md), [검증 기록](VALIDATION.md), [CI 설명](docs/BUILD_IPA.md).
+
+탐색 오류 수정 내역과 실기기 재확인: [NAVIGATION_FIX.md](docs/NAVIGATION_FIX.md).

@@ -2,6 +2,16 @@
 
 2026-09-26 · Windows · Node.js v24.19.0 · jsdom 30.1.1 · yaml 2.9.1
 
+## 2026-09-27 탐색 오류 수정 빌드 검증
+
+- 소스 commit: 21c5412310fe4c35646b9ac3ec6e5311b87d4798.
+- [Actions 36237921272](https://github.com/Boroop42/d/actions/runs/36237921272): 성공. Swift XCTest 8개, JavaScript 10개, Python 5개 모두 통과.
+- iPhoneOS arm64 Release 컴파일 성공. 새 PikoIOS-ipa artifact의 PikoIOS.ipa 1.0 (6.1)을 다운로드해 무결성 및 실제 기기 플랫폼 확인.
+- 첨부한 강아지 이미지를 앱 아이콘으로 적용. 원인 및 파일별 변경은 [NAVIGATION_FIX.md](docs/NAVIGATION_FIX.md) 참조.
+- 이전 IPA는 사용자가 Sideloadly 설치와 앱 실행을 확인했습니다. 새 빌드의 실제 X 로그인과 탐색은 기기에서 재확인해야 합니다.
+
+## 이전 빌드 기록 (아래 미검증 항목 중 컴파일·XCTest·IPA 생성은 위 결과로 해소)
+
 ## 무료 Apple ID용 IPA 빌드 변경
 
 - GitHub `macos-latest`에서 iPhoneOS arm64 Release를 빌드하고 `Payload/PikoIOS.app`을 IPA로 패키징하도록 변경했습니다.

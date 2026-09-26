@@ -9,7 +9,7 @@
 | 로딩/네트워크 오류/프로세스 종료 처리 | Fully Supported | ProgressView, 재시도 화면 |
 | 공식 X 로그인 및 로그인 유지 | Partially Supported | 공식 웹 화면과 persistent default data store. X가 임베디드 브라우저 로그인을 제한하거나 외부 SSO를 요구하면 우회하지 않음. 공식 X 웹 로그인 사용 |
 | 홈/검색/알림/DM/프로필/상세 | Partially Supported | 공식 웹 페이지로 이동. X의 계정·지역·브라우저 정책에 종속 |
-| 외부 링크 | Fully Supported | HTTP(S) 외부 링크를 시스템 기본 브라우저에 전달. 기본 브라우저가 Safari가 아닐 수 있음. 외부 SSO 쿠키는 WebKit과 공유하지 않음 |
+| 외부 링크 | Fully Supported | 사용자가 직접 누른 main-frame HTTP(S) 링크만 시스템 기본 브라우저로 전달. 외부 자동 redirect는 취소. 기본 브라우저가 Safari가 아닐 수 있음. 외부 SSO 쿠키는 WebKit과 공유하지 않음 |
 | 설정 저장/툴바 숨김 | Fully Supported | UserDefaults Codable 저장. 툴바 숨김 시 작은 설정 버튼 유지 |
 | Promoted posts | Partially Supported | 구조화된 광고 표식 또는 placementTracking+광고 라벨. 본문 단어로 판정하지 않음. DOM/언어 변경 시 원래 UI 유지 |
 | Promoted trends | Partially Supported | trend 내부 정확히 일치하는 광고 라벨. 지원 라벨은 코드에 명시 |
@@ -28,7 +28,7 @@
 | XPostReference 및 게시물별 메뉴 | Not Implemented | Phase 3. 현재 URL 감시는 있으나 게시물 모델·전용 메뉴는 없음 |
 | Default 아이콘 | Fully Supported | 사용자가 제공한 강아지 PNG를 1024px RGB AppIcon으로 적용 |
 | Dark/Blue/Minimal 대체 아이콘 | Not Implemented | Phase 5. 별도 appiconset 및 alternate icon build setting/API 필요 |
-| Debug Console | Not Implemented | Phase 5. 현재는 콘텐츠·URL·인증 정보를 로그로 수집하지 않음 |
+| Debug Console | Partially Supported | Debug 빌드 console에 탐색 결정 및 오류 domain/code를 출력. query/fragment/사용자 정보/임의 경로 제거. 앱 내 console UI는 미구현. Release에서는 출력하지 않음 |
 | JavaScript → native bridge | Not Implemented | Phase 1–2에서는 불필요하므로 등록하지 않음. 추후 origin/main-frame/type/payload 검증 필수 |
 | 토큰·비밀번호 추출, 토큰 import/export, private API | Not Implemented | 요구에 따라 의도적으로 제외. 향후 단계에서도 구현하지 않음 |
 
