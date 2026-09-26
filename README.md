@@ -29,7 +29,15 @@ Output: **`PikoIOS.ipa`** — Windows의 AltStore Classic/AltServer 또는 Sidel
 - 게시물 글꼴 80–160%, enhancement 해제 시 복원.
 - X 관련 캐시·로그인 데이터 삭제.
 
-X 웹사이트의 로그인 정책과 DOM 변경에 따른 제약은 [FEATURE_COMPATIBILITY.md](FEATURE_COMPATIBILITY.md)에 기록했습니다. 토큰·비밀번호 추출, private API, 인증 정보 외부 업로드는 없습니다. 기본 아이콘은 X 자산과 무관한 자체 제작 그림입니다.
+X 웹사이트의 로그인 정책과 DOM 변경에 따른 제약은 [FEATURE_COMPATIBILITY.md](FEATURE_COMPATIBILITY.md)에 기록했습니다. 토큰·비밀번호 추출, private API, 인증 정보 외부 업로드는 없습니다. 앱 아이콘은 사용자가 제공한 강아지 이미지입니다.
+
+## 탐색 오류 수정
+
+HTTPS의 `x.com`/`twitter.com` 및 점으로 구분된 하위 도메인은 앱 안에서 이동합니다. `evilx.com`이나 `x.com.evil.com`은 X 도메인으로 인식하지 않습니다. 외부 HTTP(S) 주소는 사용자가 직접 누른 main-frame 링크만 시스템 브라우저로 열고, 외부 자동 redirect는 조용히 취소합니다. `about:blank`는 허용하며 임의 custom scheme은 허용하지 않습니다.
+
+`NSURLErrorDomain/-999`와 `WebKitErrorDomain/102`는 정상 탐색 중단으로 분류하여 오류 overlay를 띄우지 않습니다. 현재 main-frame navigation의 실제 네트워크 실패만 표시하고 이전 navigation의 늦은 실패는 무시합니다. 최초 `/home` 요청은 캐시 재검증과 30초 timeout을 사용합니다.
+
+Debug 빌드의 `[PikoNavigation]` 로그에는 URL(민감 부분 제거), hostname, navigationType, mainFrame, 결정, 오류 domain/code가 표시됩니다. query, fragment, user/password, 임의 경로는 기록하지 않습니다. Release IPA에는 이 로그가 포함되지 않습니다. 쿠키·header·토큰을 조회하거나 출력하는 코드는 없습니다.
 
 ## CI가 만드는 것
 

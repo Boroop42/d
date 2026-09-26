@@ -61,9 +61,9 @@ private struct BrowserContent: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Button { model.webView?.goBack() } label: { Image(systemName: "chevron.left") }
+                    Button { model.goBack() } label: { Image(systemName: "chevron.left") }
                         .disabled(!model.canGoBack).accessibilityLabel("뒤로")
-                    Button { model.webView?.goForward() } label: { Image(systemName: "chevron.right") }
+                    Button { model.goForward() } label: { Image(systemName: "chevron.right") }
                         .disabled(!model.canGoForward).accessibilityLabel("앞으로")
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {

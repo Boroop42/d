@@ -45,6 +45,8 @@ jobs:
         run: |
           python3 scripts/release_config.py
           xcodegen generate --spec build/ci-project.json --project .
+      - name: Run iOS XCTest navigation regressions
+        run: bash scripts/test-ios.sh
       - name: Build Release for physical iPhone (iphoneos arm64)
         id: compile
         run: |

@@ -87,12 +87,23 @@ test('placement layout requires a promotion label outside body and author', () =
   } finally { dom.window.close(); }
 });
 test('rejects lookalike hosts and insecure origins', () => {
-  for (const url of ['https://x.com.evil.example/', 'https://evilx.com/', 'http://x.com/']) {
+  for (const url of ['https://x.com.evil.example/', 'https://evilx.com/', 'https://faketwitter.com/', 'http://x.com/', 'https://x.com:8443/']) {
     const dom = page(url);
     try {
       dom.window.eval(source());
       assert.equal(dom.window.document.querySelectorAll('[data-piko-hidden]').length, 0);
       assert.equal(dom.window.__pikoCleanup, undefined);
+    } finally { dom.window.close(); }
+  }
+});
+test('enhancements survive X-owned subdomain redirects', () => {
+  for (const url of ['https://mobile.x.com/home', 'https://foo.x.com/test', 'https://mobile.twitter.com/home']) {
+    const dom = page(url);
+    try {
+      dom.window.eval(source());
+      assert.ok(isHidden(dom, 'ad'));
+      assert.ok(isHidden(dom, 'views'));
+      assert.equal(dom.window.document.getElementById('body').style.fontSize, '26px');
     } finally { dom.window.close(); }
   }
 });

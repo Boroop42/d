@@ -12,17 +12,30 @@ final class BrowserViewModel: ObservableObject {
     @Published var clearingData = false
     @Published var webViewID = UUID()
     weak var webView: WKWebView?
+    var navigationState = MainFrameNavigationState()
     private var removalContinuation: CheckedContinuation<Void, Never>?
 
     func navigate(_ path: String) {
-        guard let target = URL(string: "https://x.com" + path) else { return }
-        errorMessage = nil
-        webView?.load(URLRequest(url: target))
+        guard let request = BrowserRequest.request(path: path), let webView else { return }
+        start(webView.load(request))
     }
 
     func reload() {
         errorMessage = nil
-        if webView?.url == nil { navigate("/home") } else { webView?.reload() }
+        if let url = webView?.url, !XURLParser.isSafeBlank(url) {
+            start(webView?.reload())
+        } else {
+            navigate("/home")
+        }
+    }
+
+    func goBack() { start(webView?.goBack()) }
+    func goForward() { start(webView?.goForward()) }
+
+    func start(_ navigation: WKNavigation?) {
+        guard let navigation else { return }
+        errorMessage = nil
+        navigationState.begin(navigation)
     }
 
     func clearWebsiteData(includingLogin: Bool) async {
@@ -45,6 +58,7 @@ final class BrowserViewModel: ObservableObject {
     func didDismantle(_ view: WKWebView) {
         guard webView === view else { return }
         webView = nil
+        navigationState = MainFrameNavigationState()
         removalContinuation?.resume()
         removalContinuation = nil
     }

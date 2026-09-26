@@ -26,7 +26,7 @@
 | 영상 다운로드, MediaMetadataProvider, FxTwitter | Not Implemented | Phase 4. 공개 URL만 취급할 교체 가능 provider 필요. blob/DRM/접근 제한은 우회 불가 |
 | 번역 및 TranslationProvider | Not Implemented | Phase 4. 대상 iOS 버전에 맞는 Apple 번역 API와 fallback 설계를 별도로 검토 |
 | XPostReference 및 게시물별 메뉴 | Not Implemented | Phase 3. 현재 URL 감시는 있으나 게시물 모델·전용 메뉴는 없음 |
-| Default 아이콘 | Fully Supported | X 자산을 사용하지 않은 네 개 원형의 임시 PNG |
+| Default 아이콘 | Fully Supported | 사용자가 제공한 강아지 PNG를 1024px RGB AppIcon으로 적용 |
 | Dark/Blue/Minimal 대체 아이콘 | Not Implemented | Phase 5. 별도 appiconset 및 alternate icon build setting/API 필요 |
 | Debug Console | Not Implemented | Phase 5. 현재는 콘텐츠·URL·인증 정보를 로그로 수집하지 않음 |
 | JavaScript → native bridge | Not Implemented | Phase 1–2에서는 불필요하므로 등록하지 않음. 추후 origin/main-frame/type/payload 검증 필수 |

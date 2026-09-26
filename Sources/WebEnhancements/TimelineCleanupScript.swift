@@ -15,7 +15,7 @@ enum TimelineCleanupScript {
           group.querySelectorAll('a[href]').forEach(link => {
             try {
               const url = new URL(link.getAttribute('href'), location.origin);
-              if (['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'].includes(url.hostname) &&
+              if (url.protocol === 'https:' && isXHost(url.hostname) &&
                   /^\/[A-Za-z0-9_]+\/status\/\d+\/analytics\/?$/.test(url.pathname)) hide(link);
             } catch (_) { /* Leave unfamiliar UI visible. */ }
           });

@@ -7,7 +7,8 @@ enum WebScript {
         return """
         (() => {
         'use strict';
-        if (location.protocol !== 'https:' || !['x.com', 'www.x.com', 'twitter.com', 'www.twitter.com'].includes(location.hostname)) return;
+        const isXHost = host => ['x.com', 'twitter.com'].some(base => host === base || host.endsWith('.' + base));
+        if (location.protocol !== 'https:' || !isXHost(location.hostname) || (location.port && location.port !== '443')) return;
         if (globalThis.__pikoCleanup) globalThis.__pikoCleanup();
         const settings = \(json);
         \(AdBlockScript.source)

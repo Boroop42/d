@@ -53,40 +53,62 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
 
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                  decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
-        guard let url = action.request.url else { decisionHandler(.cancel); return }
-        // Subframe loading stays within WebKit; it never receives enhancement scripts.
-        if action.targetFrame?.isMainFrame == false { decisionHandler(.allow); return }
-        if XURLParser.isInternal(url) {
+        let decision = NavigationPolicy.decide(url: action.request.url,
+                                               userActivatedLink: action.navigationType == .linkActivated,
+                                               isMainFrame: action.targetFrame?.isMainFrame ?? true)
+        NavigationDiagnostics.navigation(url: action.request.url, type: action.navigationType.rawValue,
+                                         mainFrame: action.targetFrame?.isMainFrame, decision: decision)
+        switch decision {
+        case .allow:
             decisionHandler(.allow)
-        } else {
+        case .openExternal:
             decisionHandler(.cancel)
-            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") {
-                UIApplication.shared.open(url)
-            }
+            if let url = action.request.url { UIApplication.shared.open(url) }
+        case .cancel:
+            decisionHandler(.cancel)
         }
     }
 
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         if action.targetFrame == nil, let url = action.request.url, XURLParser.isInternal(url) {
-            webView.load(action.request)
+            model.start(webView.load(action.request))
         }
         return nil
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         model.errorMessage = nil
+        model.start(navigation)
     }
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { sync() }
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { fail(error) }
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { fail(error) }
+    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
+        if model.navigationState.isCurrent(navigation) { model.errorMessage = nil }
+    }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        if model.navigationState.isCurrent(navigation) { model.errorMessage = nil }
+    }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if model.navigationState.finish(navigation) { model.errorMessage = nil }
+        sync()
+    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        fail(error, navigation: navigation)
+    }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        fail(error, navigation: navigation)
+    }
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         model.errorMessage = "웹 콘텐츠가 종료되었습니다. 다시 불러오세요."
         model.isLoading = false
         webView.scrollView.refreshControl?.endRefreshing()
     }
-    private func fail(_ error: Error) {
-        guard (error as NSError).code != NSURLErrorCancelled else { return }
+    private func fail(_ error: Error, navigation: WKNavigation?) {
+        // WKNavigationDelegate failure callbacks describe main-frame loads. Match their navigation
+        // identity as well, so stale callbacks cannot overwrite a newly started or finished page.
+        let shouldPresent = model.navigationState.shouldPresent(error as NSError, for: navigation)
+        NavigationDiagnostics.failure(error as NSError, ignored: !shouldPresent)
+        guard shouldPresent else { return }
+        _ = model.navigationState.finish(navigation)
         model.errorMessage = error.localizedDescription
         model.isLoading = false
         model.webView?.scrollView.refreshControl?.endRefreshing()

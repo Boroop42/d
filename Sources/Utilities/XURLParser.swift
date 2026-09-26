@@ -6,7 +6,16 @@ enum XURLParser {
               url.user == nil, url.password == nil,
               url.port == nil || url.port == 443,
               let host = url.host?.lowercased() else { return false }
-        return ["x.com", "www.x.com", "twitter.com", "www.twitter.com"].contains(host)
+        return isXHost(host)
+    }
+
+    static func isXHost(_ host: String) -> Bool {
+        let host = host.lowercased()
+        return ["x.com", "twitter.com"].contains { host == $0 || host.hasSuffix("." + $0) }
+    }
+
+    static func isSafeBlank(_ url: URL) -> Bool {
+        url.absoluteString.lowercased() == "about:blank"
     }
 
     static func isXDataDomain(_ domain: String) -> Bool {
