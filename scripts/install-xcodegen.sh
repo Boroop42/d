@@ -9,10 +9,9 @@ curl --fail --location --silent --show-error --retry 3 \
   --output "$tool_dir/xcodegen.zip"
 printf '%s  %s\n' "$digest" "$tool_dir/xcodegen.zip" | shasum -a 256 --check --status
 unzip -q "$tool_dir/xcodegen.zip" -d "$tool_dir/unpacked"
-binary=$(find "$tool_dir/unpacked" -type f -name xcodegen | head -n 1)
-test -n "$binary"
-mkdir -p "$tool_dir/bin"
-cp "$binary" "$tool_dir/bin/xcodegen"
-chmod +x "$tool_dir/bin/xcodegen"
-"$tool_dir/bin/xcodegen" --version | grep -F "$version"
-printf '%s\n' "$tool_dir/bin" >> "$GITHUB_PATH"
+# Keep bin and share together: XcodeGen loads build setting presets relative to its binary.
+install_root="$tool_dir/unpacked/xcodegen"
+test -f "$install_root/share/xcodegen/SettingPresets/Platforms/iOS.yml"
+chmod +x "$install_root/bin/xcodegen"
+"$install_root/bin/xcodegen" --version | grep -F "$version"
+printf '%s\n' "$install_root/bin" >> "$GITHUB_PATH"

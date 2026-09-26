@@ -47,7 +47,9 @@ jobs:
           xcodegen generate --spec build/ci-project.json --project .
       - name: Build Release for physical iPhone (iphoneos arm64)
         id: compile
-        run: bash scripts/build-device.sh
+        run: |
+          python3 scripts/verify_project.py
+          bash scripts/build-device.sh
       - name: Package and verify PikoIOS.ipa for re-signing
         id: ipa
         run: |
