@@ -52,7 +52,7 @@ final class WebViewCoordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+                 decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
         guard let url = action.request.url else { decisionHandler(.cancel); return }
         // Subframe loading stays within WebKit; it never receives enhancement scripts.
         if action.targetFrame?.isMainFrame == false { decisionHandler(.allow); return }
