@@ -1,0 +1,7 @@
+{
+  "name": "piko-ios-enhancement-tests",
+  "private": true,
+  "scripts": { "test": "node --test Tests/JavaScript/*.test.cjs" },
+  "devDependencies": { "jsdom": "30.1.1", "yaml": "2.9.1" },
+  "engines": { "node": "^22.22.2 || ^24.15.0 || >=26.0.0" }
+}

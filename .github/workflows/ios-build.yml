@@ -1,0 +1,86 @@
+name: Build PikoIOS IPA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      marketing_version:
+        description: App version (optional; default 1.0)
+        type: string
+        default: ''
+      bundle_id:
+        description: Bundle identifier (optional; default com.local.pikoios)
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: piko-ipa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    env:
+      XCODE_VERSION: ${{ vars.XCODE_VERSION }}
+      IOS_BUNDLE_ID: ${{ inputs.bundle_id || vars.IOS_BUNDLE_ID || 'com.local.pikoios' }}
+      MARKETING_VERSION: ${{ inputs.marketing_version || vars.MARKETING_VERSION || '1.0' }}
+      CURRENT_PROJECT_VERSION: ${{ vars.CURRENT_PROJECT_VERSION }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Select Xcode
+        run: bash scripts/select-xcode.sh
+      - name: Install XcodeGen 2.46.0
+        run: bash scripts/install-xcodegen.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: DOM and IPA configuration tests
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm test
+          python3 -m unittest discover -s Tests/Python -v
+      - name: Generate Xcode project
+        id: generate
+        run: |
+          python3 scripts/release_config.py
+          xcodegen generate --spec build/ci-project.json --project .
+      - name: Build Release for physical iPhone (iphoneos arm64)
+        id: compile
+        run: bash scripts/build-device.sh
+      - name: Package and verify PikoIOS.ipa for re-signing
+        id: ipa
+        run: |
+          python3 scripts/package_ipa.py
+          python3 scripts/verify_ipa.py
+      - name: Upload PikoIOS.ipa
+        id: artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PikoIOS-ipa
+          path: |
+            build/export/PikoIOS.ipa
+            build/export/SHA256SUMS.txt
+            build/export/INSTALL.txt
+          if-no-files-found: error
+          retention-days: 30
+      - name: Write release status
+        if: always()
+        env:
+          GENERATE_OUTCOME: ${{ steps.generate.outcome }}
+          COMPILE_OUTCOME: ${{ steps.compile.outcome }}
+          IPA_OUTCOME: ${{ steps.ipa.outcome }}
+          ARTIFACT_OUTCOME: ${{ steps.artifact.outcome }}
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: python3 scripts/release_status.py
+      - name: Upload build report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PikoIOS-build-report
+          path: |
+            build/RELEASE_STATUS.md
+            build/logs/
+            build/version.json
+          if-no-files-found: ignore
+          retention-days: 30
